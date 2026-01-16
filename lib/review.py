@@ -19,7 +19,7 @@ class Review:
             f"Employee ID: {self.employee_id}>"
         )
 
-    # -------- year --------
+    # ---------- year ----------
     @property
     def year(self):
         return self._year
@@ -31,7 +31,7 @@ class Review:
         else:
             raise ValueError("year must be an integer")
 
-    # -------- summary --------
+    # ---------- summary ----------
     @property
     def summary(self):
         return self._summary
@@ -43,7 +43,7 @@ class Review:
         else:
             raise ValueError("summary must be a non-empty string")
 
-    # -------- employee_id --------
+    # ---------- employee_id ----------
     @property
     def employee_id(self):
         return self._employee_id
@@ -55,7 +55,7 @@ class Review:
         else:
             raise ValueError("employee_id must reference an employee")
 
-    # -------- table methods --------
+    # ---------- table methods ----------
     @classmethod
     def create_table(cls):
         sql = """
@@ -95,7 +95,6 @@ class Review:
 
     @classmethod
     def find_by_id(cls, id):
-        """Return Review object corresponding to the table row matching the specified primary key"""
         sql = """
             SELECT *
             FROM reviews
@@ -115,3 +114,33 @@ class Review:
             review = cls(row[1], row[2], row[3], row[0])
             cls.all[review.id] = review
         return review
+
+    # ---------- REQUIRED BY TESTS ----------
+    def update(self):
+        sql = """
+            UPDATE reviews
+            SET year = ?, summary = ?, employee_id = ?
+            WHERE id = ?
+        """
+        CURSOR.execute(
+            sql,
+            (self.year, self.summary, self.employee_id, self.id)
+        )
+        CONN.commit()
+
+    def delete(self):
+        sql = """
+            DELETE FROM reviews
+            WHERE id = ?
+        """
+        CURSOR.execute(sql, (self.id,))
+        CONN.commit()
+
+        del type(self).all[self.id]
+        self.id = None
+
+    @classmethod
+    def get_all(cls):
+        sql = "SELECT * FROM reviews"
+        rows = CURSOR.execute(sql).fetchall()
+        return [cls.instance_from_db(row) for row in rows]
