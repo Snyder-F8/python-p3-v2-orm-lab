@@ -94,6 +94,17 @@ class Review:
         return review
 
     @classmethod
+    def find_by_id(cls, id):
+        """Return Review object corresponding to the table row matching the specified primary key"""
+        sql = """
+            SELECT *
+            FROM reviews
+            WHERE id = ?
+        """
+        row = CURSOR.execute(sql, (id,)).fetchone()
+        return cls.instance_from_db(row) if row else None
+
+    @classmethod
     def instance_from_db(cls, row):
         review = cls.all.get(row[0])
         if review:
