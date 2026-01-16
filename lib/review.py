@@ -26,10 +26,10 @@ class Review:
 
     @year.setter
     def year(self, year):
-        if type(year) is int:
+        if type(year) is int and year >= 2000:
             self._year = year
         else:
-            raise ValueError("year must be an integer")
+            raise ValueError("year must be an integer >= 2000")
 
     # ---------- summary ----------
     @property
